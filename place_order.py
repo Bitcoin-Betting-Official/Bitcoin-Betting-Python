@@ -91,5 +91,49 @@ async def place_order():
         logging.error(f"Error in place_order: {e}")
         raise
 
+
+async def make_transfer():
+    try:
+        logging.info("Will make a transfer on Bitcoin betting.")
+
+        # ATTENTION: Make sure that all parameters are in alphabetical order.
+        order_data = {
+            "Amount": 0.01,
+            "CreatedByUser": unix_to_ticks(int(time.time() * 1000)),
+            "From": 9,
+            "ID": maker_order_id,
+            "MinerFeeStr": "0.00001",
+            "NodeID": 102,
+            "To": 12,
+            "UserID": 9,
+        }
+
+        # Sign the message
+        message = json.dumps(order_data,separators=(',', ':'))
+
+        logging.info(message)
+        signature = web3.eth.account.sign_message(
+            encode_defunct(text=message), private_key=PRIVATE_KEY
+        ).signature
+
+        # Prepare WebSocket message
+        ws_message = {
+            "Type": "Transfer",
+            "SignatureUser": hex_to_base64(signature.hex()),
+            "Data": order_data
+        }
+
+        # Connect to WebSocket and send message
+        async with websockets.connect(NODE_URL) as ws:
+            await ws.send(json.dumps(ws_message))
+            async for msg in ws:
+                response = json.loads(msg)
+                if response.get("Type") == "Transfer":
+                    logging.info(f"Transfer Status: {response}")
+                    break
+    except Exception as e:
+        logging.error(f"Error in place_order: {e}")
+        raise
+
 if __name__ == "__main__":
     asyncio.run(place_order())
