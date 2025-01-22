@@ -19,6 +19,15 @@ BB_ABI = [
     },
     {
         "constant": False,
+        "inputs": [],
+        "name": "resetWithdrawalLimit",
+        "outputs": [],
+        "payable": False,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": False,
         "inputs": [
             {"name": "amount", "type": "uint256"},
             {"name": "tokenAddress", "type": "address"},
