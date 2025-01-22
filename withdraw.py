@@ -47,6 +47,29 @@ amount = 20  # 0.1 mETH
 currency_id = 1  # Currency ID: 'mBTC' = 0, 'mETH' = 1, 'WBTC' = 2
 
 
+
+async def reset_limit():
+    try:
+
+        main_contract = web3.eth.contract(address=BB_CONTRACT_ADDRESS, abi=BB_ABI)
+
+        transaction = main_contract.functions.resetWithdrawalLimit().build_transaction({
+            'chainId': 1,
+            'gas': 300000,
+            'gasPrice': web3.to_wei('10', 'gwei'),
+            'nonce': web3.eth.get_transaction_count(account.address)
+        })
+
+        signed_tx = web3.eth.account.sign_transaction(transaction, private_key=PRIVATE_KEY)
+        tx_hash = web3.eth.send_raw_transaction(signed_tx.raw_transaction)
+        logging.info(f"reset transaction sent, hash: {web3.to_hex(tx_hash)}")
+        receipt = web3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+        logging.info("reset transaction confirmed: %s", receipt)
+        return web3.to_hex(tx_hash)
+    except Exception as e:
+        logging.error(f"Error in reset withdrawal: {e}")
+        raise
+
 async def request_withdraw():
     try:
         logging.info("Will request a withdraw on Bitcoin Betting.")
@@ -159,7 +182,8 @@ async def send_withdraw():
 
 
 if __name__ == "__main__":
-    try:
+    try:        
+        #asyncio.run(reset_limit())
         asyncio.run(request_withdraw())
         asyncio.run(send_withdraw())
     except Exception as e:
