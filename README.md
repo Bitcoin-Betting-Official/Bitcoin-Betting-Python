@@ -3,7 +3,7 @@
 ## Disclaimer
 
 The code was provided by an external developer. Use with caution. This code is still under development and has not been tested properly. 
-Refer to the C# and Javascript implementation in any case.
+Refer to the C# and Javascript implementation if you should have any problems.
 
 ## Introduction
 
