@@ -2,7 +2,7 @@
 
 ## Disclaimer
 
-The code was provided by an external developer. Use with caution. It is still in developing and has not been tested properly. 
+The code was provided by an external developer. Use with caution. This code is still under development and has not been tested properly. 
 Refer to the C# and Javascript implementation in any case.
 
 ## Introduction
