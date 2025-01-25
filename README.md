@@ -1,8 +1,15 @@
 # Readme Documentation
 
+## Disclaimer
+
+The code was provided by an external developer. Use with caution. It is still in developing and has not been tested properly. 
+Refer to the C# and Javascript implementation in any case.
+
 ## Introduction
 
+
 This project provides Python examples to interact with the Bitcoin Betting API. It includes functionalities such as depositing funds, requesting withdrawals, placing orders, and subscribing to user balances.
+
 
 ## Prerequisites
 
