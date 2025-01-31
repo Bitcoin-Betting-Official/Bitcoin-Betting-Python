@@ -8,7 +8,7 @@ import uuid
 from web3 import Web3
 from eth_account import Account
 from eth_account.messages import encode_defunct
-from utils import unix_to_ticks, hex_to_base64, BB_ABI, BB_CONTRACT_ADDRESS, CURRENCIES_DATA, \
+from utils import unix_to_ticks, hex_to_base64, BB_RSK_ABI, BB_CONTRACT_ADDRESS, CURRENCIES_DATA, \
     check_environment_variables
 
 # Configure logging
