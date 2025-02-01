@@ -111,7 +111,7 @@ async def claim_deposit(deposit_hash, amount):
 
 
 if __name__ == "__main__":
-    amount = 0.0001  # 1 mEth - It must be more than 0.1 mETH
+    amount = 0.0001  #  0.0001 RBTC
     try:
         #deposit_hash = "0xe2d43450237e6c36b7d5d07b5e2439bbad1f00ac9c083cea6f18d6f524705eb1"
         deposit_hash = asyncio.run(send_deposit(amount,"test"))
