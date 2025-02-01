@@ -43,7 +43,7 @@ def parse_ether(amount):
 async def send_deposit(amount, note):
     try:
         logging.info("Will deposit and monitor transaction.")
-        main_contract = web3.eth.contract(address=BB_CONTRACT_ADDRESS, abi=BB_ABI)
+        main_contract = web3.eth.contract(address=BB_CONTRACT_ADDRESS, abi=BB_RSK_ABI)
         amount_unit = parse_ether(amount)
         gasprice = int( web3.eth.gas_price*1.2)
 
