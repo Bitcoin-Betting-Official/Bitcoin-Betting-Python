@@ -51,12 +51,22 @@ async def send_allowance(amount, currency_id):
         erc20_contract = web3.eth.contract(address=currency['contract'], abi=ERC20_ABI)
         amount_unit = parse_units(amount, currency['decimals'])
 
+        tx_without_gas = erc20_contract.functions.approve(
+            BB_CONTRACT_ADDRESS, amount_unit
+        ).build_transaction({
+            'chainId': 1,  # Mainnet
+            'gasPrice': web3.eth.gas_price,
+            'nonce': web3.eth.get_transaction_count(account.address)
+        })
+
+        estimated_gas = get_dynamic_gas(tx_without_gas)
+
         transaction = erc20_contract.functions.approve(
             BB_CONTRACT_ADDRESS, amount_unit
         ).build_transaction({
             'chainId': 1,  # Mainnet
-            'gas': 200000,
-            'gasPrice': web3.to_wei('10', 'gwei'),
+            'gas': estimated_gas,
+            'gasPrice': web3.eth.gas_price,
             'nonce': web3.eth.get_transaction_count(account.address)
         })
 
@@ -79,6 +89,19 @@ async def send_deposit(amount, currency_id):
         main_contract = web3.eth.contract(address=BB_CONTRACT_ADDRESS, abi=BB_ABI)
         amount_unit = parse_units(amount, currency['decimals'])
 
+        tx_without_gas = main_contract.functions.depositERC(
+            amount_unit,
+            currency['contract'],
+            currency_id,
+            int(USER_ID)
+        ).build_transaction({
+            'chainId': 1,
+            'gasPrice': web3.eth.gas_price,
+            'nonce': web3.eth.get_transaction_count(account.address)
+        })
+
+        estimated_gas = get_dynamic_gas(tx_without_gas)
+
         transaction = main_contract.functions.depositERC(
             amount_unit,
             currency['contract'],
@@ -86,8 +109,8 @@ async def send_deposit(amount, currency_id):
             int(USER_ID)
         ).build_transaction({
             'chainId': 1,
-            'gas': 300000,
-            'gasPrice': web3.to_wei('10', 'gwei'),
+            'gas': estimated_gas,
+            'gasPrice': web3.eth.gas_price,
             'nonce': web3.eth.get_transaction_count(account.address)
         })
 

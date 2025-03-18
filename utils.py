@@ -420,3 +420,17 @@ def check_environment_variables():
     for var in required_vars:
         if not os.getenv(var):
             raise EnvironmentError(f"{var} environment variable not found.")
+
+
+def get_dynamic_gas(transaction):
+    """
+    Estimates the gas required for a transaction dynamically.
+    Falls back to a default value if estimation fails.
+    """
+    try:
+        estimated_gas = web3.eth.estimate_gas(transaction)
+        buffer_gas = int(estimated_gas * 1.2)
+        return buffer_gas
+    except Exception as e:
+        logging.error(f"Gas estimation failed: {e}, using fallback gas limit.")
+        return 300000

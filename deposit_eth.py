@@ -46,10 +46,19 @@ async def send_deposit(amount):
         main_contract = web3.eth.contract(address=BB_CONTRACT_ADDRESS, abi=BB_ABI)
         amount_unit = parse_ether(amount)
 
+        tx_without_gas = main_contract.functions.deposit(USER_ID).build_transaction({
+            'chainId': 1,
+            'gasPrice': web3.eth.gas_price,
+            'nonce': web3.eth.get_transaction_count(account.address),
+            'value': amount_unit
+        })
+
+        estimated_gas = get_dynamic_gas(tx_without_gas)
+
         transaction = main_contract.functions.deposit(USER_ID).build_transaction({
             'chainId': 1,  # Mainnet
-            'gas': 300000,
-            'gasPrice': web3.to_wei('20', 'gwei'),
+            'gas': estimated_gas,
+            'gasPrice': web3.eth.gas_price,
             'nonce': web3.eth.get_transaction_count(account.address),
             'value': amount_unit
         })
