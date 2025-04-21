@@ -117,13 +117,14 @@ async def request_withdraw():
         raise
 
 
-async def send_withdraw():
+
+async def send_withdraw(txid=None):
     try:
         async with websockets.connect(NODE_URL) as ws:
             message = {
                 "Type": "GetBurnValidations",
                 "Data": {
-                    "MaxResults": 1,
+                    "MaxResults": 15,
                     "NodeID": NODE_ID,
                     "UserID": USER_ID
                 }
@@ -134,32 +135,47 @@ async def send_withdraw():
             sign1=''
             sign2=''
             sing3=''
-            fetchedsigns =0
+            fetchedsigns = 0
+            address_parsed = ''
             await ws.send(json.dumps(message))
             async for msg in ws:
                 response = json.loads(msg)
+                breakIt=False
                 if response.get("Type") == "GetBurnValidations":
                     logging.info(f"Withdraw request status: {response}")
-                    burn_validation = response["Data"][0]
-                    if burn_validation["Cur"] == currency_id:
-                        amount_rbtc = web3.to_wei(burn_validation["Amount"] / 1000, "ether")
+                    for burn_validation in response["Data"]:
+                    #burn_validation = response["Data"][0]
+                        if burn_validation["Cur"] == currency_id:
+                            amount_rbtc = web3.to_wei(burn_validation["Amount"] / 1000, "ether")
 
-                    if burn_validation["ValidatorID"] == 1:
-                        sign1 = burn_validation["SignatureValidator"]
-                        fetchedsigns  += 1
-                    if burn_validation["ValidatorID"] == 2:
-                        sign2 = burn_validation["SignatureValidator"]
-                        fetchedsigns += 1
-                    if burn_validation["ValidatorID"] == 3:
-                        sign3 = burn_validation["SignatureValidator"]
-                        fetchedsigns += 1
-                    if fetchedsigns==2 :
+                        if burn_validation["ValidatorID"] == 1 and (burn_validation["TXID"] == txid  or txid is None):
+                            sign1 = burn_validation["SignatureValidator"]
+                            address_parsed = burn_validation["Address"]
+                            fetchedsigns  += 1
+                        if burn_validation["ValidatorID"] == 2 and (burn_validation["TXID"] == txid  or txid is None):
+                            sign2 = burn_validation["SignatureValidator"]
+                            address_parsed = burn_validation["Address"]
+                            fetchedsigns += 1
+                        if burn_validation["ValidatorID"] == 3 and (burn_validation["TXID"] == txid  or txid is None):
+                            sign3 = burn_validation["SignatureValidator"]
+                            address_parsed = burn_validation["Address"]
+                            fetchedsigns += 1
+                        if fetchedsigns==2 :
+                            breakIt=True
+                            break
+                    if breakIt:
                         break
+            if sign1 == '':
+                sign1 = sign2
+            if sign2 =='':
+                sign2 = sign3
+            if sign3 == '':
+                sign3= sign2
 
             request = main_contract.functions.withdraw(
                 amount_rbtc,
                 int(burn_validation["Nonce"]),
-                account.address,
+                Web3.to_checksum_address(address_parsed),
                 f"0x{burn_validation['TXID']}",
                 sign1,
                 sign2,
